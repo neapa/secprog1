@@ -1,6 +1,9 @@
-// Options.js main function:
+// Options.js operates the options.html API setup page in which the user inputs 
+// the AbuseIPDB api key and PIN for encryption and authentication.
+
 // 1. The user opens the extension setting page: options.html
 // 2. User inputs their AbuseIPDB API key and PIN
+
 // 3. We make the PIN into a strong key using PBKDF2
 // 4. This key is used with AES-GCM to encrypt the API key.
 // 5. Everything is saved in local browser storage in encrypted form.
