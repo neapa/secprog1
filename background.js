@@ -33,44 +33,49 @@ browser.runtime.onInstalled.addListener(() => {
     });
 });
 
-// Listening when user clicks the extension right-click menu
-browser.contextMenus.onClicked.addListener((info, tab) => {
+// ... inside background.js contextMenus.onClicked listener:
+browser.contextMenus.onClicked.addListener(async (info, tab) => {
     if (info.menuItemId === "lookup-ip" && info.selectionText) {
-        const ip = info.selectionText.trim(); // Gets the highlighted text and removes spaces
+        const ip = info.selectionText.trim();
 
         if (isValidIP(ip)) {
             const spurUrl = "https://spur.us/context/" + ip;
 
-            // Save the IP in local browser storage for popup.js to use it.
-            browser.storage.local.set({ selectedIP: ip }).then(() => {
+            // Save IP for popup.js
+            await browser.storage.local.set({ selectedIP: ip });
 
-                // This opens up the spur.us url. Active: true means user will definitely see it popping on top.
-                browser.tabs.create({ url: spurUrl, active: true });
+            // Get current tab info
+            const [currentTab] = await browser.tabs.query({ active: true, currentWindow: true });
 
-                // Opens the AbuseIPDB popup window to display AbuseIPDB info. This window is still empty.
-                browser.windows.getCurrent().then(win => {
-                    const popupWidth = 500;
-                    const popupHeight = 500;
-                    const margin = 115;
-                  
-                    // Creating dynamic style for the window
-                    const top = win.top + margin;
-                    const left = win.left + win.width - popupWidth - margin;
-                  
-                    // Defining the content of the popup window
-                    browser.windows.create({
-                      url: "popup.html", // This includes popup.js logic.
-                      type: "popup",
-                      width: popupWidth,
-                      height: popupHeight,
-                      top: top,
-                      left: left
-                    });
-                  });
-                  
+            // Open spur.us tab next to current tab
+            const spurTab = await browser.tabs.create({
+                url: spurUrl,
+                index: currentTab.index,
+                active: true // You want it visible right away
             });
+
+            // Open the popup window but return to original tab after short delay
+            const popupWidth = 500;
+            const popupHeight = 500;
+            const margin = 115;
+
+            const win = await browser.windows.getCurrent();
+            const top = win.top + margin;
+            const left = win.left + win.width - popupWidth - margin;
+
+            const popupWindow = await browser.windows.create({
+                url: "popup.html",
+                type: "popup",
+                width: popupWidth,
+                height: popupHeight,
+                top: top,
+                left: left,
+                focused: false // Only works in Chrome
+            });
+
+          
         } else {
-            // User will be notified if the IP is not valid. 
+            // Invalid IP notification
             if (browser.notifications) {
                 browser.notifications.create({
                     type: "basic",
