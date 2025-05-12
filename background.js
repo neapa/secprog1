@@ -187,7 +187,9 @@ browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         }
         // Fetches from the AbuseIPDB api the information
         const ip = msg.ip; // IP address is got from popup.js
-        fetch(`https://api.abuseipdb.com/api/v2/check?ipAddress=${encodeURIComponent(ip)}&maxAgeInDays=90`, {
+
+        // here we connect to the API using key. The verbous flag gives us the full country name.
+        fetch(`https://api.abuseipdb.com/api/v2/check?ipAddress=${encodeURIComponent(ip)}&maxAgeInDays=90&verbose=true`, {
             method: "GET",                      // GET message means we are asking something from the api
             headers: {
                 "Accept": "application/json",   // Response is given in json format
