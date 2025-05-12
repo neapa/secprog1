@@ -17,6 +17,7 @@ const ipv4Pattern = /^(25[0-5]|2[0-4]\d|[01]?\d?\d)(\.(25[0-5]|2[0-4]\d|[01]?\d?
 const ipv6Pattern = /^(?:(?:[0-9A-Fa-f]{1,4}:){7}(?:[0-9A-Fa-f]{1,4}|:)|(?:[0-9A-Fa-f]{1,4}:){6}(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}|:[0-9A-Fa-f]{1,4}|:)|(?:[0-9A-Fa-f]{1,4}:){5}(?::(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}|(?::[0-9A-Fa-f]{1,4}){1,2}|:)|(?:[0-9A-Fa-f]{1,4}:){4}(?:(?::[0-9A-Fa-f]{1,4}){0,1}:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}|(?::[0-9A-Fa-f]{1,4}){1,3}|:)|(?:[0-9A-Fa-f]{1,4}:){3}(?:(?::[0-9A-Fa-f]{1,4}){0,2}:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}|(?::[0-9A-Fa-f]{1,4}){1,4}|:)|(?:[0-9A-Fa-f]{1,4}:){2}(?:(?::[0-9A-Fa-f]{1,4}){0,3}:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}|(?::[0-9A-Fa-f]{1,4}){1,5}|:)|(?:[0-9A-Fa-f]{1,4}:){1}(?:(?::[0-9A-Fa-f]{1,4}){0,4}:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}|(?::[0-9A-Fa-f]{1,4}){1,6}|:)|(?::(?:(?::[0-9A-Fa-f]{1,4}){0,5}:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}|(?::[0-9A-Fa-f]{1,4}){1,7}|:)))(?:%\S+)?$/;
 
 // Tests if the IP address maches the regex
+// The code does not simply work if user does not give valid IP.
 function isValidIP(address) {
     return ipv4Pattern.test(address) || ipv6Pattern.test(address);
 }
@@ -33,32 +34,36 @@ browser.runtime.onInstalled.addListener(() => {
     });
 });
 
-// ... inside background.js contextMenus.onClicked listener:
+// This listens when user clicks the extension in the right click menu.
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
     if (info.menuItemId === "lookup-ip" && info.selectionText) {
+
+        // Removes spaces and saves the highlighted text as IP.
+        // No need to validate here since we modify the ip as text, not executable.
         const ip = info.selectionText.trim();
 
         if (isValidIP(ip)) {
             const spurUrl = "https://spur.us/context/" + ip;
 
-            // Save IP for popup.js
+            // Saves IP to local memory for popup.js to use
             await browser.storage.local.set({ selectedIP: ip });
 
-            // Get current tab info
+            // In order to have the tab opening in the right order this gets current tab info
             const [currentTab] = await browser.tabs.query({ active: true, currentWindow: true });
 
             // Open spur.us tab next to current tab
             const spurTab = await browser.tabs.create({
                 url: spurUrl,
-                index: currentTab.index,
-                active: true // You want it visible right away
+                index: currentTab.index, // right index is used so when user closes tab, it returns to tab they were in first place. (UX)
+                active: true // This shows it visible right away.
             });
 
-            // Open the popup window but return to original tab after short delay
+            // Shows also the popup
             const popupWidth = 500;
             const popupHeight = 500;
             const margin = 115;
 
+            // Dynamic settings for window
             const win = await browser.windows.getCurrent();
             const top = win.top + margin;
             const left = win.left + win.width - popupWidth - margin;
@@ -70,21 +75,8 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
                 height: popupHeight,
                 top: top,
                 left: left,
-                focused: false // Only works in Chrome
             });
-
-          
-        } else {
-            // Invalid IP notification
-            if (browser.notifications) {
-                browser.notifications.create({
-                    type: "basic",
-                    iconUrl: browser.runtime.getURL("icon_128x128.png"),
-                    title: "Spur us + AbuseIPDB",
-                    message: "Highlighted text is not a valid IP address."
-                });
-            }
-        }
+        } 
     }
 });
 
