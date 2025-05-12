@@ -112,44 +112,42 @@ function fetchIPData(ip) {
             // The main output of the popup window: The AbuseIPDB IP Address information:
             let outputHtml = "";
             
-            outputHtml += `<p><strong>IP Address: </strong>${escapeHtml(info.ipAddress)}</p>`;                           // IP Address
+            outputHtml += `<p><strong>IP Address: </strong>${escapeHtml(info.ipAddress)}</p>`;                          // IP Address
             // These information might not be available, so it is checked first:
             if (info.isp) {
-                outputHtml += `<p><strong>ISP: </strong>${escapeHtml(info.isp)}</p>`; // ISP
+                outputHtml += `<p><strong>ISP: </strong>${escapeHtml(info.isp)}</p>`;                                   // ISP
             }
 
             if (info.usageType) {
-                outputHtml += `<p><strong>Usage Type: </strong>${escapeHtml(info.usageType)}</p>`; // Usage type
+                outputHtml += `<p><strong>Usage Type: </strong>${escapeHtml(info.usageType)}</p>`;                      // Usage type
             }
 
             if (info.asn !== undefined) {
-                outputHtml += `<p><strong>ASN: </strong>${escapeHtml(info.asn.toString())}</p>`; // ASN
+                outputHtml += `<p><strong>ASN: </strong>${escapeHtml(info.asn.toString())}</p>`;                        // ASN
             }
 
             if (info.domain) {
-                outputHtml += `<p><strong>Domain: </strong>${escapeHtml(info.domain)}</p>`; // Domain
+                outputHtml += `<p><strong>Domain: </strong>${escapeHtml(info.domain)}</p>`;                             // Domain
             }
 
-            if (info.countryCode) {
-                outputHtml += `<p><strong>Country: </strong>${escapeHtml(info.countryCode)}</p>`; // Country
+            if (info.countryName) {
+                outputHtml += `<p><strong>Country: </strong>${escapeHtml(info.countryName)}</p>`;                       // Country
             }
 
             if (info.hostnames && info.hostnames.length > 0) {
                 outputHtml += `<p><strong>Hostnames: </strong>${info.hostnames.map(h => escapeHtml(h)).join(", ")}</p>`; // Hostnames
             }
 
-
-
             if (info.totalReports !== undefined) {
-                outputHtml += `<p><strong>Total Reports: </strong>${info.totalReports}</p>`; // Total reports
+                outputHtml += `<p><strong>Total Reports: </strong>${info.totalReports}</p>`;                                // Total reports
             }
 
             if (info.abuseConfidenceScore !== undefined) {
-                outputHtml += `<p><strong>Abuse Confidence Score: </strong>${info.abuseConfidenceScore}%</p>`; // Abuse Confidence
+                outputHtml += `<p><strong>Abuse Confidence Score: </strong>${info.abuseConfidenceScore}%</p>`;              // Abuse Confidence
             }
 
             if (info.lastReportedAt) {
-                outputHtml += `<p><strong>Last Reported: </strong>${escapeHtml(info.lastReportedAt)}</p>`; // Last reported
+                outputHtml += `<p><strong>Last Reported: </strong>${escapeHtml(info.lastReportedAt)}</p>`;                  // Last reported
             }
 
             resultDiv.innerHTML = outputHtml;
