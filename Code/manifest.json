@@ -1,0 +1,40 @@
+{
+  "manifest_version": 2,
+  "name": "IP Checker: AbuseIPDB + Spur.us",
+  "version": "1.0",
+  "description": "Highlight IP, right-click to lookup details via AbuseIPDB (with encrypted key) and Spur.us.",
+  "permissions": [
+    "contextMenus",
+    "storage",
+    "tabs",
+    "https://api.abuseipdb.com/",
+    "https://spur.us/context/*"
+  ],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": true
+  },
+  "browser_action": {
+    "default_icon": {
+      "16": "icon_16x16.png",
+      "48": "icon_48x48.png",
+      "128": "icon_128x128.png"
+    },
+    "default_popup": "popup.html"
+  },
+  "icons": {
+    "16": "icon_16x16.png",
+    "48": "icon_48x48.png",
+    "128": "icon_128x128.png"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": false
+  },
+  "content_security_policy": "default-src 'none'; script-src 'self'; style-src 'self'; connect-src https://api.abuseipdb.com/; img-src 'self';",
+  "applications": {
+    "gecko": {
+      "id": "spurus@abuseipdb"
+    }
+  }
+}
