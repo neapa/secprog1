@@ -1,6 +1,6 @@
 Code folder includes the source code heavily commented by me.
 
-The purpose of each file is very well explained in the presentation inside the documentation folder "PRESENTATION - SPUR_US+ABUSEIPDB.pdf"
+The way my code works is explained very fell in "PRESENTATION - SPUR_US+ABUSEIPDB.pdf"
 Documentation folder
 
 DEMO VID - AbuseIPDB+Spur (download).mp4 is the presentation demo video in smaller size showing how the project works in real life. (SHOWS full UI)
